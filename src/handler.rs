@@ -7,6 +7,8 @@ use error::Error;
 use httprequest::HttpRequest;
 use httpresponse::HttpResponse;
 
+use tower::Service;
+
 /// Trait defines object that could be registered as route handler
 #[allow(unused_variables)]
 pub trait Handler<S>: 'static {
@@ -29,6 +31,20 @@ pub trait Responder {
 
     /// Convert itself to `Reply` or `Error`.
     fn respond_to(self, req: HttpRequest) -> Result<Self::Item, Self::Error>;
+}
+
+impl Handler<()>
+    for Service<
+        Request = HttpRequest,
+        Response = String,
+        Error = Error,
+        Future = Box<Future<Item = String, Error = Error>>,
+    > {
+    type Result = Result<String, Error>;
+
+    fn handle(&mut self, req: HttpRequest<()>) -> Self::Result {
+        self.call(req).wait()
+    }
 }
 
 /// Trait implemented by types that can be extracted from request.

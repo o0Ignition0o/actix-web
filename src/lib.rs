@@ -112,6 +112,7 @@ extern crate serde_urlencoded;
 extern crate smallvec;
 #[macro_use]
 extern crate actix;
+extern crate tower;
 
 #[cfg(test)]
 #[macro_use]
